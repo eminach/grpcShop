@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "ShoppingServer";
+
+// The greeting service definition.
+service Stock {
+  // Sends an order request
+  rpc AvailableInStock (StockRequest) returns (StockAvailableResponse);
+  rpc TakeFromStock (StockRequest) returns (TakeFromStockResponse);
+}
+
+// The order request.
+message StockRequest {
+  string product_id = 1;
+  int32 quantity =2;
+}
+
+// The response message represents product availabilty in stock.
+message StockAvailableResponse {
+  string product_id = 1;
+  bool quantity_available=2;
+}
+
+// The response message represents decrease product quantity from stock
+message TakeFromStockResponse {
+	string product = 1;
+	bool succes =2;
+}
