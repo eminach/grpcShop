@@ -1,9 +1,10 @@
 syntax = "proto3";
 
-option csharp_namespace = "ShoppingServer";
+option csharp_namespace = "ShopClient";
 
 // The greeting service definition.
 service Stock {
+  // Sends an order request
   rpc AvailableInStock (StockRequest) returns (StockAvailableResponse);
   rpc TakeFromStock (StockRequest) returns (TakeFromStockResponse);
   rpc PopulateProducts (ProductRequest) returns (ProductResponse);
@@ -26,7 +27,6 @@ message TakeFromStockResponse {
 	string product = 1;
 	bool succes =2;
 }
-
 
 //Product initialization
 message ProductRequest {

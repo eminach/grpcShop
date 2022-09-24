@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "ShopClient";
+
+// The Order service definition.
+service Order {
+  // Sends an product order request
+  rpc Order (OrderRequest) returns (OrderResponse);
+}
+
+// The order request.
+message OrderRequest {
+  string product = 1;
+  int32 quantity = 2;
+}
+
+// The response message of the order operation result.
+message OrderResponse {
+  string product = 1;
+  bool succes = 2;
+}

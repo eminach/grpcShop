@@ -1,4 +1,5 @@
 ﻿using BusinessLogic;
+using BusinessLogic.Models;
 using Grpc.Core;
 using ShoppingServer;
 using ShoppingServer.DatabaseSettings;
@@ -9,11 +10,13 @@ namespace ShoppingServer.Services
     {
         private readonly ILogger<StockService> _logger;
         private readonly StockDBService _stockDBService;
+        private readonly ProductDBService _productDBService;
 
-        public StockService(ILogger<StockService> logger, StockDBService stockDBService)
+        public StockService(ILogger<StockService> logger, StockDBService stockDBService, ProductDBService productDBService)
         {
             _logger = logger;
             _stockDBService = stockDBService;
+            _productDBService = productDBService;
         }
 
         /// <summary>
@@ -26,14 +29,14 @@ namespace ShoppingServer.Services
         {
             var result = await _stockDBService.GetByProductAsync(request.ProductId);
 
-            if(result == null)
+            if (result == null)
             {
                 //TODO: Here may redesigned and return proper exception
                 return await Task.FromResult(new StockAvailableResponse() { ProductId = request.ProductId, QuantityAvailable = false });
             }
             else
             {
-                bool quantityAvailable = request.Quantity >= result.Quantity;
+                bool quantityAvailable = request.Quantity <= result.Quantity;
                 return await Task.FromResult(new StockAvailableResponse() { ProductId = request.ProductId, QuantityAvailable = quantityAvailable });
             }
         }
@@ -76,5 +79,33 @@ namespace ShoppingServer.Services
                 }
             }
         }
+
+        #region Populate
+
+        public override async Task<ProductResponse> PopulateProducts(ProductRequest request, ServerCallContext context)
+        {
+            //Insert products
+            var prodList = MockData.GetProducts();
+
+            foreach (var prod in prodList)
+            {
+                await _productDBService.CreateAsync(prod);//TODO: check results
+            }
+
+            //Insert one stock data
+
+            //Get one product id
+
+            var firstProduct = _productDBService.GetAsync().Result.FirstOrDefault();
+
+            if (firstProduct != null)
+            {
+                await _stockDBService.CreateAsync(new BusinessLogic.Models.Stock() { ProdID = firstProduct.Id, Quantity = 20, OperationDate = DateTime.Now });
+            }
+
+            return await Task.FromResult(new ProductResponse() { Succes = true }); //TODO: I now its not correct return like this but for simplicity
+        }
+
+        #endregion
     }
 }
