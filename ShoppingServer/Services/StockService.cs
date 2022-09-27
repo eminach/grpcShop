@@ -70,10 +70,13 @@ namespace ShoppingServer.Services
                     {
                         ProdID = request.ProductId,
                         Quantity = newQuantity,
-                        OperationDate = DateTime.Now
-                    };
+                        OperationDate = DateTime.Now,
+                        Timestamp = DateTimeOffset.UtcNow.Ticks
+                };
 
-                    await _stockDBService.UpdateAsync(result.Id, updatedStock); //TODO: Check completed
+                    await _stockDBService.UpdateAsync(result.Id, updatedStock); 
+                    
+                    //TODO: Check if completed
 
                     return await Task.FromResult(new TakeFromStockResponse() { Product = request.ProductId, Succes = true });
                 }
@@ -100,7 +103,9 @@ namespace ShoppingServer.Services
 
             if (firstProduct != null)
             {
-                await _stockDBService.CreateAsync(new BusinessLogic.Models.Stock() { ProdID = firstProduct.Id, Quantity = 20, OperationDate = DateTime.Now });
+                await _stockDBService.CreateAsync(newStock: new BusinessLogic.Models.Stock() { 
+                            ProdID = firstProduct.Id, Quantity = 20, OperationDate = DateTime.Now, Timestamp = DateTimeOffset.UtcNow.Ticks 
+                            });
             }
 
             return await Task.FromResult(new ProductResponse() { Succes = true }); //TODO: I now its not correct return like this but for simplicity
